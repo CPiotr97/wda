@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Wiedzy o Polsce</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            background-color: #EFF6FF;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .quiz-container {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 42rem;
+        }
+        
+        .quiz-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            color: #1D4ED8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-container {
+            margin-bottom: 1rem;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .progress-bar-bg {
+            height: 0.5rem;
+            width: 100%;
+            background-color: #E5E7EB;
+            border-radius: 9999px;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #2563EB;
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+        }
+        
+        .question-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .option-button {
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.5rem;
+            background-color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .option-button:hover {
+            background-color: #DBEAFE;
+        }
+        
+        .result-container {
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .score-circle {
+            height: 6rem;
+            width: 6rem;
+            margin: 0 auto 1rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #DBEAFE;
+        }
+        
+        .score-percent {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #1D4ED8;
+        }
+        
+        .result-message {
+            color: #4B5563;
+            margin-bottom: 1.5rem;
+        }
+        
+        .answers-summary {
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .answer-item {
+            border-bottom: 1px solid #E5E7EB;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
+        
+        .answer-question {
+            font-weight: 500;
+        }
+        
+        .answer-text {
+            font-size: 0.875rem;
+        }
+        
+        .correct {
+            color: #059669;
+            font-weight: 500;
+        }
+        
+        .incorrect {
+            color: #DC2626;
+            font-weight: 500;
+        }
+        
+        .email-form {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #F9FAFB;
+            border-radius: 0.5rem;
+        }
+        
+        .email-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .email-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .email-input-group {
+                flex-direction: row;
+            }
+        }
+        
+        .email-input {
+            flex-grow: 1;
+            padding: 0.5rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
+        }
+        
+        .send-button, .restart-button {
+            background-color: #2563EB;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .send-button:hover, .restart-button:hover {
+            background-color: #1D4ED8;
+        }
+        
+        .error-message {
+            color: #DC2626;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .success-message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #ECFDF5;
+            color: #059669;
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .restart-button {
+            margin-top: 1.5rem;
+            padding: 0.5rem 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="quiz-container">
+        <h1 class="quiz-title">Quiz Wiedzy o Polsce</h1>
+        <div id="quiz-content"></div>
+    </div>
+
+    <script>
+        // Pytania quizu
+        const questions = [
+            {
+                question: "Który polski król jest znany jako 'Chrobry'?",
+                options: ["Mieszko I", "Bolesław I", "Kazimierz Wielki", "Władysław Jagiełło"],
+                correctAnswer: "Bolesław I"
+            },
+            {
+                question: "W którym roku Polska przystąpiła do Unii Europejskiej?",
+                options: ["2002", "2004", "2007", "2010"],
+                correctAnswer: "2004"
+            },
+            {
+                question: "Która rzeka jest najdłuższa w Polsce?",
+                options: ["Wisła", "Odra", "Bug", "Warta"],
+                correctAnswer: "Wisła"
+            },
+            {
+                question: "Kto jest autorem 'Pana Tadeusza'?",
+                options: ["Henryk Sienkiewicz", "Adam Mickiewicz", "Juliusz Słowacki", "Bolesław Prus"],
+                correctAnswer: "Adam Mickiewicz"
+            },
+            {
+                question: "Która z tych gór znajduje się w Polsce?",
+                options: ["Alpy", "Tatry", "Pireneje", "Karpaty Południowe"],
+                correctAnswer: "Tatry"
+            },
+            {
+                question: "Co jest symbolem Warszawy?",
+                options: ["Lajkonik", "Smok Wawelski", "Syrenka", "Neptun"],
+                correctAnswer: "Syrenka"
+            },
+            {
+                question: "Który polski naukowiec otrzymał Nagrodę Nobla z fizyki i chemii?",
+                options: ["Lech Wałęsa", "Maria Skłodowska-Curie", "Wisława Szymborska", "Czesław Miłosz"],
+                correctAnswer: "Maria Skłodowska-Curie"
+            },
+            {
+                question: "Gdzie znajduje się najstarszy uniwersytet w Polsce?",
+                options: ["Warszawa", "Kraków", "Poznań", "Wrocław"],
+                correctAnswer: "Kraków"
+            },
+            {
+                question: "Jaki jest najwyższy szczyt Polski?",
+                options: ["Śnieżka", "Rysy", "Giewont", "Babia Góra"],
+                correctAnswer: "Rysy"
+            },
+            {
+                question: "Które z tych miast było kiedyś stolicą Polski?",
+                options: ["Gdańsk", "Poznań", "Kraków", "Łódź"],
+                correctAnswer: "Kraków"
+            }
+        ];
+
+        // Stan aplikacji
+        let currentQuestion = 0;
+        let score = 0;
+        let answers = Array(questions.length).fill('');
+        let showScore = false;
+        let email = '';
+        let emailSent = false;
+        let emailError = '';
+
+        // Inicjalizacja quizu
+        function initializeQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answers = Array(questions.length).fill('');
+            showScore = false;
+            email = '';
+            emailSent = false;
+            emailError = '';
+            renderQuiz();
+        }
+
+        // Obsługa odpowiedzi
+        function handleAnswer(answer) {
+            answers[currentQuestion] = answer;
+            
+            if (answer === questions[currentQuestion].correctAnswer) {
+                score++;
+            }
+            
+            const nextQuestion = currentQuestion + 1;
+            if (nextQuestion < questions.length) {
+                currentQuestion = nextQuestion;
+                renderQuiz();
+            } else {
+                showScore = true;
+                renderQuiz();
+            }
+        }
+
+        // Walidacja emaila
+        function validateEmail(email) {
+            return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+        }
+
+        // Obsługa wysyłania emaila
+        function handleSendEmail() {
+            const emailInput = document.getElementById('email-input');
+            email = emailInput.value;
+            
+            if (!validateEmail(email)) {
+                emailError = 'Proszę podać poprawny adres email';
+                renderQuiz();
+                return;
+            }
+            
+            emailError = '';
+            
+            // Przygotowanie danych do wysłania na webhook
+            const quizData = {
+                email: email,
+                score: score,
+                totalQuestions: questions.length,
+                percentageScore: Math.round((score / questions.length) * 100),
+                answers: questions.map((question, index) => ({
+                    question: question.question,
+                    userAnswer: answers[index],
+                    correctAnswer: question.correctAnswer,
+                    isCorrect: answers[index] === question.correctAnswer
+                }))
+            };
+            
+            // Wysłanie danych na webhook
+            fetch('https://hook.eu2.make.com/8ip2niklqk1c4h9whamnu5oaplpfgsdp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(quizData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    emailSent = true;
+                    renderQuiz();
+                } else {
+                    emailError = 'Wystąpił problem podczas wysyłania wyników. Spróbuj ponownie.';
+                    renderQuiz();
+                }
+            })
+            .catch(error => {
+                emailError = 'Błąd połączenia. Sprawdź swoje połączenie z internetem i spróbuj ponownie.';
+                console.error('Error:', error);
+                renderQuiz();
+            });
+        }
+
+        // Restart quizu
+        function restartQuiz() {
+            initializeQuiz();
+        }
+
+        // Renderowanie quizu
+        function renderQuiz() {
+            const quizContent = document.getElementById('quiz-content');
+            
+            if (!showScore) {
+                // Wyświetl pytanie
+                const progressPercentage = ((currentQuestion) / questions.length) * 100;
+                
+                quizContent.innerHTML = `
+                    <div class="progress-container">
+                        <div class="progress-info">
+                            <span>Pytanie ${currentQuestion + 1}/${questions.length}</span>
+                            <span>Wynik: ${score}</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: ${progressPercentage}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-container">
+                        <h2 class="question-text">${questions[currentQuestion].question}</h2>
+                        <div class="options-container">
+                            ${questions[currentQuestion].options.map(option => `
+                                <button class="option-button" onclick="handleAnswer('${option}')">${option}</button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Wyświetl wyniki
+                const percentageScore = Math.round((score / questions.length) * 100);
+                let resultMessage = '';
+                
+                if (score === questions.length) {
+                    resultMessage = "Doskonale! Zdobyłeś maksymalną liczbę punktów!";
+                } else if (score >= questions.length * 0.7) {
+                    resultMessage = "Świetny wynik! Masz dobrą wiedzę o Polsce.";
+                } else if (score >= questions.length * 0.5) {
+                    resultMessage = "Całkiem nieźle! Warto jeszcze poczytać o Polsce.";
+                } else {
+                    resultMessage = "Warto pogłębić swoją wiedzę o Polsce.";
+                }
+                
+                quizContent.innerHTML = `
+                    <div class="result-container">
+                        <h2 class="result-title">Twój wynik: ${score} z ${questions.length}</h2>
+                        
+                        <div class="score-circle">
+                            <span class="score-percent">${percentageScore}%</span>
+                        </div>
+                        
+                        <p class="result-message">${resultMessage}</p>
+                        
+                        <div class="answers-summary">
+                            <h3 class="summary-title">Podsumowanie odpowiedzi:</h3>
+                            <div>
+                                ${questions.map((question, index) => `
+                                    <div class="answer-item">
+                                        <p class="answer-question">${index + 1}. ${question.question}</p>
+                                        <p class="answer-text">
+                                            Twoja odpowiedź: <span class="${answers[index] === question.correctAnswer ? 'correct' : 'incorrect'}">
+                                                ${answers[index]}
+                                            </span>
+                                        </p>
+                                        ${answers[index] !== question.correctAnswer ? `
+                                            <p class="answer-text correct">
+                                                Poprawna odpowiedź: ${question.correctAnswer}
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        ${!emailSent ? `
+                            <div class="email-form">
+                                <h3 class="email-title">Otrzymaj wyniki na email:</h3>
+                                <div class="email-input-group">
+                                    <input 
+                                        type="email" 
+                                        id="email-input" 
+                                        placeholder="Twój adres email" 
+                                        class="email-input"
+                                    />
+                                    <button onclick="handleSendEmail()" class="send-button">
+                                        Wyślij wyniki
+                                    </button>
+                                </div>
+                                ${emailError ? `<p class="error-message">${emailError}</p>` : ''}
+                            </div>
+                        ` : `
+                            <div class="success-message">
+                                <p>Wyniki zostały wysłane na adres: ${email}</p>
+                            </div>
+                        `}
+                        
+                        <button onclick="restartQuiz()" class="restart-button">
+                            Rozpocznij quiz ponownie
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Inicjalizacja quizu po załadowaniu strony
+        window.onload = initializeQuiz;
+    </script>
+</body>
+</html>
